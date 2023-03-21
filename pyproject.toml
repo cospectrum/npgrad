@@ -1,7 +1,9 @@
 [tool.poetry]
 name = "npgrad"
 version = "0.1.0"
+repository = "https://github.com/cospectrum/npgrad"
 description = ""
+license = "Apache-2.0"
 authors = ["cospectrum <severinalexeyv@gmail.com>"]
 readme = "README.md"
 
