@@ -2,16 +2,17 @@ from npgrad.core import Op
 
 
 def test_op() -> None:
+    Args = list[int]
 
-    def first(args: list[int]) -> int:
+    def first(args: Args) -> int:
         return args[0]
 
-    def second(args: list[int]) -> int:
+    def second(args: Args) -> int:
         return args[1]
 
     def jump(f: Op[int]) -> Op[int]:
 
-        def closure(args: list[int]) -> int:
+        def closure(args: Args) -> int:
             return args[f(args)]
 
         return closure

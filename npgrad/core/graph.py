@@ -1,15 +1,13 @@
 from __future__ import annotations
 
-
 from dataclasses import dataclass
-from typing import Generic, TypeVar
+from typing import Generic, Sequence, TypeVar
 
-from .node import Node, NodeId, T as Token
+from .node import Node, TokenId, TokenIds, T as Token
 
 
-Nodes = list[Node[Token]]
-Edges = dict[NodeId, Nodes[Token]]
-Results = dict[NodeId, Token]
+Nodes = Sequence[Node[Token]]
+TokenMap = dict[TokenId, Token]
 
 T = TypeVar('T')
 
@@ -17,43 +15,29 @@ T = TypeVar('T')
 @dataclass
 class Graph(Generic[T]):
     nodes: Nodes[T]
-    edges: Edges[T]
 
-    @staticmethod
-    def new() -> Graph[T]:
-        return Graph(nodes=[], edges=dict())
-
-    def run(self) -> Results[T]:
+    def run(self, inputs: TokenMap[T]) -> TokenMap[T]:
         order = self.topological_order()
-        results: Results[T] = dict()
+        return self.run_with_order(inputs, order)
+
+    def run_with_order(self, inputs: TokenMap, order: Nodes[T]) -> TokenMap[T]:
+        sym_table = inputs.copy()
 
         for node in order:
-            inputs = [results[child.id] for child in self.children(node)]
-            output = node.eval(inputs)
-            results[node.id] = output
-
-        return results
-
-    def add_edge(self, src: Node[T], dst: Node[T]) -> None:
-        edges = self.edges
-        if dst.id not in edges:
-            edges[dst.id] = []
-        edges[dst.id].append(src)
-
-    def add_node(self, node: Node[T]) -> None:
-        self.nodes.append(node)
-
-    def children(self, node: Node[T]) -> Nodes[T]:
-        return self.edges.get(node.id, [])
+            args = [sym_table[token_id] for token_id in node.inputs]
+            out = node.eval(args)
+            for token_id in node.outputs:
+                sym_table[token_id] = out
+        return sym_table
 
     def topological_order(self) -> Nodes[T]:
         order = []
         visited = set()
 
         def visit(node: Node[T]) -> None:
-            if node.id in visited:
+            if node in visited:
                 return
-            visited.add(node.id)
+            visited.add(node)
             children = self.children(node)
             for child in children:
                 visit(child)
@@ -62,3 +46,11 @@ class Graph(Generic[T]):
         for node in self.nodes:
             visit(node)
         return order
+
+    def children(self, node: Node[T]) -> Nodes[T]:
+        inputs = node.inputs
+
+        def overlap(ids: TokenIds) -> bool:
+            return len(set(ids).intersection(inputs)) != 0
+
+        return [n for n in self.nodes if overlap(n.outputs)]
