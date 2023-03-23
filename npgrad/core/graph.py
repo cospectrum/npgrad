@@ -35,9 +35,9 @@ class Graph(Generic[T]):
         visited = set()
 
         def visit(node: Node[T]) -> None:
-            if node in visited:
+            if id(node) in visited:
                 return
-            visited.add(node)
+            visited.add(id(node))
             children = self.children(node)
             for child in children:
                 visit(child)
@@ -50,7 +50,7 @@ class Graph(Generic[T]):
     def children(self, node: Node[T]) -> Nodes[T]:
         inputs = node.inputs
 
-        def overlap(ids: TokenIds) -> bool:
+        def wired(ids: TokenIds) -> bool:
             return len(set(ids).intersection(inputs)) != 0
 
-        return [n for n in self.nodes if overlap(n.outputs)]
+        return [n for n in self.nodes if wired(n.outputs)]

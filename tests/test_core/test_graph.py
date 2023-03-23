@@ -1,26 +1,30 @@
 import random
 
-from npgrad.core import Graph, NodeOp
+from npgrad.core import Graph, Node
 
 
 def test_graph() -> None:
     Args = list[float]
 
-    def add(args: Args) -> float:
-        assert len(args) == 2
-        return args[0] + args[1]
+    class Add(Node[float]):
+        def eval(self, args: Args) -> float:
+            assert len(args) == 2
+            return args[0] + args[1]
 
-    def mul(args: Args) -> float:
-        assert len(args) == 2
-        return args[0] * args[1]
+    class Mul(Node[float]):
+        def eval(self, args: Args) -> float:
+            assert len(args) == 2
+            return args[0] * args[1]
 
-    def sub(args: Args) -> float:
-        assert len(args) == 2
-        return args[0] - args[1]
+    class Sub(Node[float]):
+        def eval(self, args: Args) -> float:
+            assert len(args) == 2
+            return args[0] - args[1]
 
-    def div(args: Args) -> float:
-        assert len(args) == 2
-        return args[0] / args[1]
+    class Div(Node):
+        def eval(self, args: Args) -> float:
+            assert len(args) == 2
+            return args[0] / args[1]
 
     x = random.random()
     y = random.random()
@@ -31,10 +35,10 @@ def test_graph() -> None:
     c = b - x
     d = c * a
 
-    a_node = NodeOp(op=add, inputs=['x', 'y'], outputs=['a'])
-    b_node = NodeOp(op=div, inputs=['y', 'z'], outputs=['b'])
-    c_node = NodeOp(op=sub, inputs=['b', 'x'], outputs=['c'])
-    d_node = NodeOp(op=mul, inputs=['c', 'a'], outputs=['d'])
+    a_node = Add(inputs=['x', 'y'], outputs=['a'])
+    b_node = Div(inputs=['y', 'z'], outputs=['b'])
+    c_node = Sub(inputs=['b', 'x'], outputs=['c'])
+    d_node = Mul(inputs=['c', 'a'], outputs=['d'])
 
     nodes = [a_node, b_node, c_node, d_node]
     random.shuffle(nodes)
