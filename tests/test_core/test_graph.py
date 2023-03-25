@@ -1,7 +1,7 @@
 import random
 import pytest
 
-from npgrad.core import WeightedGraph, Node
+from npgrad.core import Graph, Node
 
 
 @pytest.mark.xfail(raises=AttributeError)
@@ -9,23 +9,13 @@ def test_graph_nodes_mutability() -> None:
     node: Node = Node()
     nodes = [node]
 
-    graph = WeightedGraph(nodes=nodes)
-    _ = graph.weights
+    graph = Graph(nodes=nodes)
+    assert graph.weights == dict()
     assert graph.nodes != []
     graph.nodes = []
 
 
-@pytest.mark.xfail(raises=AttributeError)
-def test_graph_order_mutability() -> None:
-    node: Node[float] = Node()
-    nodes = [node]
-
-    graph = WeightedGraph(nodes=nodes)
-    assert graph.order != []
-    graph.order = []
-
-
-def test_weighted_graph() -> None:
+def test_graph() -> None:
     Args = list[float]
 
     class Add(Node[float]):
@@ -72,7 +62,7 @@ def test_weighted_graph() -> None:
 
     nodes = [n0, n1, n2, n3, n4, n5]
     random.shuffle(nodes)
-    g = WeightedGraph(nodes=nodes, weights=weights)
+    g = Graph(nodes=nodes, weights=weights)
 
     inputs = {'x': x, 'y': y, 'z': z}
     sym_table = g.eval(inputs)

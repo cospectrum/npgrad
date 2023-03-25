@@ -3,7 +3,7 @@ from typing import Sequence
 from .node import Node, TokenIds
 
 
-__all__ = ['NodeIndex', 'Order', 'topological_order']
+__all__ = ['topological_order']
 
 NodeIndex = int
 Nodes = Sequence[Node]

@@ -1,2 +1,2 @@
-from .graph import Graph, WeightedGraph
+from .graph import Graph
 from .node import Node
