@@ -1,6 +1,27 @@
 import random
+import pytest
 
 from npgrad.core import Graph, Node
+
+
+@pytest.mark.xfail(raises=AttributeError)
+def test_graph_nodes_mutability() -> None:
+    node: Node = Node()
+    nodes = [node]
+
+    graph = Graph(nodes=nodes)
+    assert graph.nodes != []
+    graph.nodes = []
+
+
+@pytest.mark.xfail(raises=AttributeError)
+def test_graph_order_mutability() -> None:
+    node: Node[float] = Node()
+    nodes = [node]
+
+    graph = Graph(nodes=nodes)
+    assert graph.order != []
+    graph.order = []
 
 
 def test_graph() -> None:
@@ -45,7 +66,7 @@ def test_graph() -> None:
     g = Graph(nodes=nodes)
 
     inputs = {'x': x, 'y': y, 'z': z}
-    sym_table = g.run(inputs)
+    sym_table = g.eval(inputs)
 
     assert sym_table['x'] == x
     assert sym_table['y'] == y

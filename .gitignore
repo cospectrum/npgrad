@@ -127,3 +127,20 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+
+# Ignore all files
+/*
+
+# Do not ignore
+!.gitignore
+!.pre-commit-config.yaml
+!.flake8
+
+!LICENSE
+!README.md
+!poetry.lock
+!pyproject.toml
+
+!npgrad
+!tests
