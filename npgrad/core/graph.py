@@ -31,3 +31,23 @@ class Graph(Generic[T]):
             for token_id in node.outputs:
                 sym_table[token_id] = out
         return sym_table
+
+
+class WeightedGraph(Graph[T]):
+    weights: TokenMap[T]
+
+    def __init__(
+        self,
+        nodes: Nodes[T],
+        weights: TokenMap[T] | None = None
+    ) -> None:
+        super().__init__(nodes)
+        if weights is None:
+            weights = dict()
+        self.weights = weights
+
+    def eval(self, inputs: TokenMap[T]) -> TokenMap[T]:
+        _inputs = self.weights.copy()
+        for k in inputs:
+            _inputs[k] = inputs[k]
+        return super().eval(_inputs)

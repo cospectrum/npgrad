@@ -1,7 +1,7 @@
 import random
 import pytest
 
-from npgrad.core import Graph, Node
+from npgrad.core import WeightedGraph, Node
 
 
 @pytest.mark.xfail(raises=AttributeError)
@@ -9,7 +9,8 @@ def test_graph_nodes_mutability() -> None:
     node: Node = Node()
     nodes = [node]
 
-    graph = Graph(nodes=nodes)
+    graph = WeightedGraph(nodes=nodes)
+    _ = graph.weights
     assert graph.nodes != []
     graph.nodes = []
 
@@ -19,12 +20,12 @@ def test_graph_order_mutability() -> None:
     node: Node[float] = Node()
     nodes = [node]
 
-    graph = Graph(nodes=nodes)
+    graph = WeightedGraph(nodes=nodes)
     assert graph.order != []
     graph.order = []
 
 
-def test_graph() -> None:
+def test_weighted_graph() -> None:
     Args = list[float]
 
     class Add(Node[float]):
@@ -51,19 +52,27 @@ def test_graph() -> None:
     y = random.random()
     z = random.random()
 
-    a = x + y
+    w1 = random.random()
+    w2 = random.random()
+    weights = {'w1': w1, 'w2': w2}
+
+    w1x = w1 * x
+    a = w1x + y
     b = y / z
-    c = b - x
+    w2_div_b = w2 / b
+    c = w2_div_b - x
     d = c * a
 
-    a_node = Add(inputs=['x', 'y'], outputs=['a'])
-    b_node = Div(inputs=['y', 'z'], outputs=['b'])
-    c_node = Sub(inputs=['b', 'x'], outputs=['c'])
-    d_node = Mul(inputs=['c', 'a'], outputs=['d'])
+    n0 = Mul(inputs=['w1', 'x'], outputs=['w1*x'])
+    n1 = Add(inputs=['w1*x', 'y'], outputs=['a'])
+    n2 = Div(inputs=['y', 'z'], outputs=['b'])
+    n3 = Div(inputs=['w2', 'b'], outputs=['w2/b'])
+    n4 = Sub(inputs=['w2/b', 'x'], outputs=['c'])
+    n5 = Mul(inputs=['c', 'a'], outputs=['d'])
 
-    nodes = [a_node, b_node, c_node, d_node]
+    nodes = [n0, n1, n2, n3, n4, n5]
     random.shuffle(nodes)
-    g = Graph(nodes=nodes)
+    g = WeightedGraph(nodes=nodes, weights=weights)
 
     inputs = {'x': x, 'y': y, 'z': z}
     sym_table = g.eval(inputs)
@@ -75,3 +84,8 @@ def test_graph() -> None:
     assert sym_table['b'] == b
     assert sym_table['c'] == c
     assert sym_table['d'] == d
+
+    assert sym_table['w1'] == w1
+    assert sym_table['w2'] == w2
+    assert sym_table['w1*x'] == w1x
+    assert sym_table['w2/b'] == w2_div_b
