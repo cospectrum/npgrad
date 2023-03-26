@@ -41,10 +41,11 @@ def test_graph() -> None:
     x = random.random()
     y = random.random()
     z = random.random()
+    inputs = dict(x=x, y=y, z=z)
 
     w1 = random.random()
     w2 = random.random()
-    weights = {'w1': w1, 'w2': w2}
+    weights = dict(w1=w1, w2=w2)
 
     w1x = w1 * x
     a = w1x + y
@@ -64,7 +65,6 @@ def test_graph() -> None:
     random.shuffle(nodes)
     g = Graph(nodes=nodes, weights=weights)
 
-    inputs = {'x': x, 'y': y, 'z': z}
     sym_table = g.eval(inputs)
 
     assert sym_table['x'] == x

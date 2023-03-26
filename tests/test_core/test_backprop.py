@@ -1,5 +1,6 @@
-from dataclasses import dataclass, field
 import random
+
+from dataclasses import dataclass, field
 from typing import TypeVar
 
 from npgrad.core.backprop import Function, TrainableGraph
